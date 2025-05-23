@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://EliDaher.github.io/inventory",
+  "homepage": "https://elidaher.github.io/inventory/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
