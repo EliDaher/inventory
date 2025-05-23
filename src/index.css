@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input {
+  @apply w-full px-4 py-2 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all;
+}
+
+.label {
+  @apply block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300;
+}
+
+.error {
+  @apply text-sm text-red-500 mt-1;
+}
