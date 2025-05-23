@@ -5,6 +5,7 @@ type Product = {
   name: string;
   buyPrice: number;
   sellPrice: number;
+  unit: string;
   quantity: number;
   category: string;
   discount?: number;

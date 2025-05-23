@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getAllProducts } from "../api/products";
 
 // أعمدة جدول المنتجات
-const columns = ["الاسم", "السعر شراء", "السعر بيع", "الكمية", "القسم", "الخصم"];
+const columns = ["الاسم", "السعر شراء", "السعر بيع", "الكمية", "الواحدة", "القسم"];
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -58,8 +58,8 @@ export default function ProductsPage() {
           "السعر شراء": prod.buyPrice,
           "السعر بيع": prod.sellPrice,
           "الكمية": prod.quantity,
+          "الواحدة": prod.unit,
           "القسم": prod.category,
-          "الخصم": prod.discount || 0,
         }))}
         onRowClick={(row) => {
           console.log("تم النقر على الصف:", row["الاسم"]);

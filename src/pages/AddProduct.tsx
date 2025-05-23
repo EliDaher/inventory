@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { CheckCircle2 } from "lucide-react";
 import { addProduct } from "../api/products";
+import { addCategory, getCategory } from "../api/category";
 
 type ProductForm = {
   name: string;
   buyPrice: number;
   sellPrice: number;
+  unit: string;
   quantity: number;
   discount?: number;
   category: string;
   description?: string;
 };
-
-const CATEGORIES = [" موبايلات", " اكسسوارات", " كابلات", " بطاقات", " أخرى"];
 
 const AddProduct: React.FC = () => {
   const {
@@ -30,6 +30,10 @@ const AddProduct: React.FC = () => {
     },
   });
 
+  const [categories, setCategories] = useState<string[]>(["غير ذلك"]);
+  const [newCategory, setNewCategory] = useState("");
+  const selectedCategory = watch("category");
+
   const [total, setTotal] = useState(0);
   const [success, setSuccess] = useState(false);
 
@@ -43,20 +47,44 @@ const AddProduct: React.FC = () => {
   }, [buyPrice, quantity, discount]);
 
   const onSubmit = async (data: ProductForm) => {
-    console.log(" المنتج المُضاف:", data);
 
+    if(data.category === "غير ذلك"){
+      addCategory({name: newCategory})
+    }
+
+    const finalData = {
+      ...data,
+      category: data.category === "غير ذلك" ? newCategory : data.category,
+    };
+  
     try {
-      const result = await addProduct(data);
+      const result = await addProduct(finalData);
       console.log("✅ تمت الإضافة:", result);
-      
-
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 2000);
-        reset();
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+      reset();
+      setNewCategory("");
     } catch (error: any) {
-    console.error("❌ خطأ في الإضافة:", error.response?.data || error.message);
+      console.error("❌ خطأ في الإضافة:", error.response?.data || error.message);
     }
   };
+
+  const getCategories = async () => {
+    try {
+      const res = await getCategory();
+      if (Array.isArray(res.categoryData)) {
+        setCategories(prev => [...prev, ...res.categoryData]);
+      } else if (typeof res.categoryData === "string") {
+        setCategories(prev => [...prev, res.categoryData]);
+      }
+    } catch (error) {
+      console.error("فشل جلب التصنيفات:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
 
   return (
     <div dir="rtl" className="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 transition-all">
@@ -70,7 +98,6 @@ const AddProduct: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
         {/* اسم المنتج */}
         <div className="col-span-full">
           <label className="label"> اسم المنتج</label>
@@ -92,7 +119,7 @@ const AddProduct: React.FC = () => {
             render={({ field }) => (
               <select {...field} className="input">
                 <option value="">-- اختر التصنيف --</option>
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
@@ -100,6 +127,22 @@ const AddProduct: React.FC = () => {
           />
           {errors.category && <p className="error">{errors.category.message}</p>}
         </div>
+          
+        {/* التصنيف الجديد عند اختيار "غير ذلك" */}
+        {selectedCategory === "غير ذلك" && (
+          <div>
+            <label className="label">أدخل اسم التصنيف الجديد</label>
+            <input
+              type="text"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="مثال: بلور"
+              className="input"
+              required
+            />
+          </div>
+        )}
+
 
         {/* سعر الشراء */}
         <div>
@@ -121,6 +164,17 @@ const AddProduct: React.FC = () => {
             step="0.01"
             {...register("sellPrice", { required: "مطلوب" })}
             placeholder="مثال: 15000"
+            className="input"
+          />
+        </div>
+
+        {/* الواحدة */}
+        <div>
+          <label className="label"> الواحدة</label>
+          <input
+            type="text"
+            {...register("unit", { required: "مطلوب" })}
+            placeholder="مثال: kg"
             className="input"
           />
         </div>
@@ -149,14 +203,14 @@ const AddProduct: React.FC = () => {
 
         {/* المجموع النهائي */}
         <div className="col-span-full text-center text-xl font-bold bg-gray-50 dark:bg-gray-800 py-4 rounded-lg text-primary dark:text-primary border border-gray-200 dark:border-gray-700">
-           المجموع: {total.toLocaleString()} ل.س
+          المجموع: {total.toLocaleString()} ل.س
         </div>
 
         <button
           type="submit"
           className="col-span-full w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-hover transition-all font-bold"
         >
-           حفظ المنتج
+          حفظ المنتج
         </button>
       </form>
     </div>
