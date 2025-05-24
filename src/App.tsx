@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route } from "react-router-dom"
 import ProductsPage from "./pages/ProductsPage"
 import Navbar from "./component/Navbar"
 import AddProduct from "./pages/AddProduct"
+import ProductDetails from "./pages/ProductDetails"
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/addProduct" element={<AddProduct />} />
+            <Route path="/ProductDetails" element={<ProductDetails />} />
           </Routes>
         </div>
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getAllProducts } from "../api/products";
 
 // أعمدة جدول المنتجات
-const columns = ["الاسم", "السعر شراء", "السعر بيع", "الكمية", "الواحدة", "القسم"];
+const columns = ["الاسم", "السعر شراء", "السعر بيع", "الكمية", "الواحدة", "القسم", "بيع"];
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -60,9 +60,20 @@ export default function ProductsPage() {
           "الكمية": prod.quantity,
           "الواحدة": prod.unit,
           "القسم": prod.category,
+          "بيع": `<input 
+            type="checkbox" 
+            onChange={(e) => {
+              // هنا يمكنك تنفيذ أي شيء عند التحديد
+              console.log("تم اختيار:", row.original);
+            }} 
+          />`,
         }))}
         onRowClick={(row) => {
-          console.log("تم النقر على الصف:", row["الاسم"]);
+          navigate('/ProductDetails',
+            {
+              state: row
+            }
+          )
         }}
       />
 

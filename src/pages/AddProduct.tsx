@@ -69,18 +69,32 @@ const AddProduct: React.FC = () => {
     }
   };
 
+
   const getCategories = async () => {
     try {
       const res = await getCategory();
-      if (Array.isArray(res.categoryData)) {
-        setCategories(prev => [...prev, ...res.categoryData]);
-      } else if (typeof res.categoryData === "string") {
-        setCategories(prev => [...prev, res.categoryData]);
-      }
+    
+      // تحويل كائن التصنيفات إلى مصفوفة من الكائنات
+      const categoryArray = Object.entries(res.categoryData).map(([id, data]: [string, any]) => ({
+        id,
+        ...data,
+      }));
+    
+      // استخراج الأسماء فقط
+      const categoryNames = categoryArray.map(cat => cat.name);
+    
+      // دمج التصنيفات القديمة مع الجديدة + "غير ذلك"
+      const baseCategories = ["غير ذلك"];
+      const allCategories = Array.from(new Set([...baseCategories, ...categoryNames]));
+    
+      // حفظ التصنيفات بدون تكرار
+      setCategories(allCategories);
     } catch (error) {
       console.error("فشل جلب التصنيفات:", error);
     }
   };
+
+
 
   useEffect(() => {
     getCategories();
