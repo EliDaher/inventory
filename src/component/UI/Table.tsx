@@ -1,16 +1,21 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import SearchInput from "./SearchInput";
+
+interface Column {
+  header: string;
+  accessor: string;
+  render?: (row: { [key: string]: any }, index: number) => React.ReactNode;
+}
 
 interface TableProps {
   data: { [key: string]: string | number }[];
-  columns: string[];
+  columns: Column[];
   onRowClick?: (row: { [key: string]: string | number }) => void;
 }
 
 const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
   const rowsPerPage = 15;
 
@@ -18,7 +23,9 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
     if (!searchTerm) return data;
     return data.filter((row) =>
       columns.some((col) =>
-        String(row[col]).toLowerCase().includes(searchTerm.toLowerCase())
+        String(row[col.accessor] || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
       )
     );
   }, [searchTerm, data, columns]);
@@ -30,27 +37,12 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  const isRowSelected = (row: any) => {
-    return selectedRows.some((r) => JSON.stringify(r) === JSON.stringify(row));
-  };
 
-  const toggleRowSelection = (row: any) => {
-    setSelectedRows((prev) => {
-      const isSelected = isRowSelected(row);
-      if (isSelected) {
-        return prev.filter((r) => JSON.stringify(r) !== JSON.stringify(row));
-      } else {
-        return [...prev, row];
-      }
-    });
-  };
 
-  useEffect(()=>{
-    console.log(selectedRows)
-  }, [selectedRows])
 
   return (
     <div className="space-y-4">
+
       <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="ابحث في الجدول" />
 
       <div className="overflow-x-auto rounded-2xl shadow-md transition-all duration-300 border border-primary/30">
@@ -59,10 +51,10 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
             <tr>
               {columns.map((col) => (
                 <th
-                  key={col}
+                  key={col.accessor}
                   className="px-6 py-4 text-left text-sm font-inter font-semibold tracking-wide uppercase"
                 >
-                  {col}
+                  {col.header}
                 </th>
               ))}
             </tr>
@@ -77,20 +69,10 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
                 {columns.map((col) => (
                   <td
                     className="p-2"
-                    key={col}
-                    onClick={(e) => col === "بيع" && e.stopPropagation()}
+                    key={col.accessor}
+                    onClick={(e) => col.accessor === "بيع" && e.stopPropagation()}
                   >
-                    {col === "بيع" ? (
-                      <input
-                        type="checkbox"
-                        className="w-full cursor-pointer"
-                        checked={isRowSelected(row)}
-                        onChange={() => toggleRowSelection(row)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      row[col]
-                    )}
+                    {col.render ? col.render(row, idx) : row[col.accessor]}
                   </td>
                 ))}
               </tr>
@@ -99,7 +81,7 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
         </table>
       </div>
 
-      <div className="flex flex-row-reverse justify-center items-center gap-2 text-sm font-inter">
+      <div className="flex flex-row justify-center items-center gap-2 text-sm font-inter">
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}

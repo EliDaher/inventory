@@ -15,7 +15,7 @@ function App() {
           <Navbar/>
         </div>
 
-        <div className="bg-background dark:bg-dark-background flex-1">
+        <div className="bg-background dark:bg-dark-background flex-1 font-cairo" dir="rtl">
           <Routes>
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/addProduct" element={<AddProduct />} />
