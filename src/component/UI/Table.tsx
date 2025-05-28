@@ -11,9 +11,10 @@ interface TableProps {
   data: { [key: string]: string | number }[];
   columns: Column[];
   onRowClick?: (row: { [key: string]: string | number }) => void;
+  showPagination?: boolean;
 }
 
-const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
+const Table: React.FC<TableProps> = ({ data, columns, onRowClick, showPagination=true }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -52,7 +53,7 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
               {columns.map((col) => (
                 <th
                   key={col.accessor}
-                  className="px-6 py-4 text-left text-sm font-inter font-semibold tracking-wide uppercase"
+                  className="px-6 py-4 text-center text-sm font-inter font-semibold tracking-wide uppercase"
                 >
                   {col.header}
                 </th>
@@ -81,12 +82,13 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
         </table>
       </div>
 
+      {showPagination ? 
       <div className="flex flex-row justify-center items-center gap-2 text-sm font-inter">
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}
           className="font-cairo bg-primary px-3 py-1 rounded-md dark:bg-dark-primary text-gray-700 dark:text-gray-200 hover:bg-primary-hover dark:hover:bg-dark-primary-hover disabled:opacity-40"
-        >
+          >
           السابق
         </button>
         <span className="font-cairo text-gray dark:text-gray-300">
@@ -96,10 +98,11 @@ const Table: React.FC<TableProps> = ({ data, columns, onRowClick }) => {
           onClick={handleNext}
           disabled={currentPage === totalPages}
           className="font-cairo bg-primary px-3 py-1 rounded-md dark:bg-dark-primary text-gray-700 dark:text-gray-200 hover:bg-primary-hover dark:hover:bg-dark-primary-hover disabled:opacity-40"
-        >
+          >
           التالي
         </button>
       </div>
+      : ''}
     </div>
   );
 };

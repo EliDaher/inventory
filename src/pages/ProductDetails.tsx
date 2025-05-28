@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Input from "../component/UI/Input";
 import ThemeToggle from "../component/ThemeToggle";
 import Button from "../component/UI/Button";
+import Card from "../component/UI/Card";
 
 interface Product {
   id: string;
@@ -63,11 +64,11 @@ export default function ProductDetails() {
     return <div className="p-4 text-gray-500">لا يوجد بيانات لعرضها.</div>;
 
   return (
-    <div dir="rtl" className="p-6 max-w-2xl mt-10 mb-5 mx-5 bg-dark-background/5 dark:bg-background/5 shadow-xl rounded-2xl text-text dark:text-dark-text">
+    <Card className="mx-auto p-6 max-w-2xl mt-10 mb-5 bg-dark-background/5 dark:bg-background/5 shadow-xl rounded-2xl text-text dark:text-dark-text">
       <h2 className="text-3xl font-bold text-center mb-6">
         {productData.الاسم}
       </h2>
-        <div className="space-y-4 mb-6">
+        <div className="space-y-4">
           <Input
             label="الاسم"
             value={editedData?.الاسم}
@@ -118,6 +119,6 @@ export default function ProductDetails() {
           </div>
         </div>
       <ThemeToggle />
-    </div>
+    </Card>
   );
 }

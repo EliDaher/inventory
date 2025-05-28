@@ -20,3 +20,8 @@ export async function addCustomerInvoicePayment(newInvoice: any) {
   const response = await api.post("/addCustomerInvoicePayment", newInvoice);
   return response.data;
 }
+
+export async function addPayment(paymentDetails: any) {
+  const response = await api.post("/addPayment", paymentDetails);
+  return response.data;
+}

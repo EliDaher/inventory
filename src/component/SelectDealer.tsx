@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import Button from "./UI/Button";
 import Input from "./UI/Input";
-import { addCustomer } from "../api/customer";
+import { addDealer } from "../api/dealer";
 import Table from "./UI/Table"; 
 
-export default function SelectBuyer({setCustomer, setisOpen, customerArr, getCust}: any) {
+export default function SelectDealer({setDealer, setisOpen, dealerArr}: any) {
 
 
     const columns = [
@@ -13,23 +13,22 @@ export default function SelectBuyer({setCustomer, setisOpen, customerArr, getCus
     ];
     
 
-    const [newCustomer, setNewCustomer] = useState(false)
-    const [customerName, setCustomerName] = useState('')
-    const [customerNumber, setCustomerNumber] = useState('')
-    const [customersData, setCustomersData] = useState([])
+    const [newDealer, setNewDealer] = useState(false)
+    const [dealerName, setDealerName] = useState('')
+    const [dealerNumber, setDealerNumber] = useState('')
+    const [dealersData, setDealersData] = useState([])
 
     const sumbit = async () => {
         try{
 
-            const newCustomer = {
-                name: customerName,
-                ...(customerNumber && { customerNumber: customerNumber }),
+            const newDealer = {
+                name: dealerName,
+                ...(dealerNumber && { dealerNumber: dealerNumber }),
             }
-            const res = await addCustomer(newCustomer)
+            const res = await addDealer(newDealer)
             console.log(res)
             
-            getCust()
-            setCustomer(res.id)
+            setDealer(dealerName)
             setisOpen(false)
         }catch (error){
             console.error(error)
@@ -40,7 +39,7 @@ export default function SelectBuyer({setCustomer, setisOpen, customerArr, getCus
     const getCus = async () => {
         try{
 
-            setCustomersData(customerArr as any)
+            setDealersData(dealerArr as any)
 
         }catch (error){
             console.error(error)
@@ -49,36 +48,36 @@ export default function SelectBuyer({setCustomer, setisOpen, customerArr, getCus
 
     useEffect(()=>{
         getCus()
-    },[customerArr])
+    },[dealerArr])
 
     return (
         <div className="dark:text-dark-text text-text">
             <div className="flex gap-3">
-                <h2 className="text-xl font-bold mb-4">اختيار المشتري</h2>
+                <h2 className="text-xl font-bold mb-4">اختيار البائع</h2>
                 <Button 
                     className="h-8 bg-green-400 dark:bg-green-400 hover:bg-green-500 hover:dark:bg-green-500"
                     onClick={()=>{
-                        setNewCustomer(true)
+                        setNewDealer(true)
                     }}
-                >مشتري جديد</Button>
+                >بائغ جديد</Button>
             </div>
 
 
-            {newCustomer ?
+            {newDealer ?
             
                 <div className="">
                     <div className="">
                         الاسم :
                     <Input 
-                        value={customerName}
-                        onChange={(e) => {setCustomerName(e.target.value)}}
+                        value={dealerName}
+                        onChange={(e) => {setDealerName(e.target.value)}}
                     />
                     </div>
                     <div className="">
                         الرقم  : (اختياري)
                     <Input 
-                        value={customerNumber}
-                        onChange={(e) => {setCustomerNumber(e.target.value)}}
+                        value={dealerNumber}
+                        onChange={(e) => {setDealerNumber(e.target.value)}}
                     />
                     </div>
                 </div>
@@ -87,14 +86,14 @@ export default function SelectBuyer({setCustomer, setisOpen, customerArr, getCus
             
             <Table
                 columns={columns}
-                data={customersData.map((prod: any) => ({
+                data={dealersData.map((prod: any) => ({
                     "الاسم": prod["name"],
-                    "الرقم": prod["customerNumber"],
+                    "الرقم": prod["dealerNumber"],
                     "المعرف": prod["id"],
                 }))}
                 onRowClick={(row)=>{
                     console.log(row["المعرف"])
-                    setCustomer(row["المعرف"])
+                    setDealer(row["المعرف"])
                     setisOpen(false)
                 }}
             />

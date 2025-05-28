@@ -4,6 +4,24 @@ import Input from "./UI/Input";
 import Button from "./UI/Button";
 import SelectBuyer from "./SelectBuyer";
 import { addCustomerInvoicePayment, getCustomers } from "../api/customer";
+import pdfMake from "pdfmake/build/pdfmake";
+import AmiriCode from "../font/Amiri";
+import AmiriBold from "../font/AmiriBold";
+// استخدم as any لتفادي TypeScript error
+
+(pdfMake as any).vfs = {
+  "Amiri-Regular.ttf": `${AmiriCode}`,
+  "Amiri-Bold.ttf": `${AmiriBold}`
+};
+
+// تسجيل الخط
+(pdfMake as any).fonts = {
+  Amiri: {
+    normal: "Amiri-Regular.ttf",
+    bold: "Amiri-Bold.ttf",
+  }
+};
+
 
 export default function EndSell({ selectedRows, onClose }: any) {
   const [isOpen, setisOpen] = useState(false);
@@ -75,6 +93,115 @@ export default function EndSell({ selectedRows, onClose }: any) {
     },
   ];
 
+  const reverseArabic = (text: string) => {
+    return text.split(' ').reverse().join('  ');
+  };
+
+  
+  const generatePDF = () => {
+    const invoiceDate = new Date();
+    const formattedDate = invoiceDate.toLocaleDateString();
+    const formattedTime = invoiceDate.toLocaleTimeString();
+
+    const customer: any = customerArr.find((c: any) => c.id === customerName);
+
+    const tableBody = [
+      [
+        { text: "الإجمالي", style: "tableHeader" },
+        { text: "الواحدة", style: "tableHeader" },
+        { text: "الكمية", style: "tableHeader" },
+        { text: "السعر", style: "tableHeader" },
+        { text: "المنتج", style: "tableHeader" },
+      ],
+      ...selectedRows.map((row: any) => {
+        const key = row.id || row["الاسم"] || row.name;
+        const quantity = quantities[key] || 0;
+        const price = row["السعر بيع"];
+        const total = quantity * price;
+        return [
+          { text: total.toFixed(2), alignment: "right" },
+          { text: row["الواحدة"], alignment: "right" },
+          { text: quantity, alignment: "right" },
+          { text: price.toFixed(2), alignment: "right" },
+          { text: reverseArabic(row["الاسم"]), alignment: "right"  },
+        ];
+      }),
+    ];
+
+    const docDefinition: any = {
+      content: [
+        { text: "Basel & Akram Store", style: "header" },
+        {
+          text: `${formattedDate} : التاريخ  -  ${formattedTime} : الساعة`,
+          alignment: "right",
+          margin: [0, 5, 0, 15],
+          style: "subheader",
+        },
+        {
+          text: `${customer ? `${customer.name} - ${customer.customerNumber} : للسيد  مبيعات  فاتورة` : ""}`,
+          alignment: "right",
+          margin: [0, 0, 0, 15],
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ["*", "*", "*", "*", "*"],
+            body: tableBody,
+          },
+          layout: "lightHorizontalLines",
+        },
+        {
+          margin: [0, 20, 0, 0],
+          table: {
+            widths: ["*", "auto"],
+            body: [
+              [
+                { text: "" },
+                {
+                  stack: [
+                    { text: `${total.toFixed(2)} $ : الإجمالي`, alignment: "right", margin: [0, 5, 0, 5] },
+                    { text: `${discount.toFixed(2)} $ : الحسم`, alignment: "right", margin: [0, 0, 0, 5] },
+                    { text: `${(total - discount).toFixed(2)} $  : المطلوب المبلغ`, alignment: "right", bold: true },
+                  ],
+                },
+              ],
+            ],
+          },
+          layout: "noBorders",
+        },
+      ],
+      defaultStyle: {
+        font: "Amiri",
+        fontSize: 12,
+        alignment: "right",  // النص افتراضي إلى اليمين
+      },
+      styles: {
+        header: {
+          fontSize: 20,
+          bold: true,
+          alignment: "center",
+          margin: [0, 0, 0, 20],
+        },
+        subheader: {
+          fontSize: 14,
+        },
+        tableHeader: {
+          fillColor: "#eeeeee",
+          bold: true,
+          fontSize: 13,
+          alignment: "center",
+        },
+      },
+      pageMargins: [40, 60, 40, 60],
+      // direction: 'rtl'  // pdfMake لا يدعم خاصية direction لكن المحاذات كافية
+    };
+
+    pdfMake.createPdf(docDefinition).download(`فاتورة-${formattedDate}-${formattedTime}/ ${customer.name}.pdf`);
+  };
+
+
+
+
   const getCust = async () => {
     const res = await getCustomers();
     const tempCustomerArr = Object.values(res.customerData);
@@ -128,8 +255,8 @@ export default function EndSell({ selectedRows, onClose }: any) {
     console.log(res.data)
 
     alert("تم تنفيذ البيع بنجاح");
+    generatePDF()
     onClose();
-    window.location.reload();
   };
 
   if (isOpen) {
@@ -138,6 +265,7 @@ export default function EndSell({ selectedRows, onClose }: any) {
         setCustomer={setCustomerName}
         setisOpen={setisOpen}
         customerArr={customerArr}
+        getCust={getCust}
       />
     );
   }

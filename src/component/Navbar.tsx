@@ -10,6 +10,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "الصفحة الرئيسية", path: "/" },
     { name: "المنتجات", path: "/products" },
+    { name: "الزبائن", path: "/customers" },
   ];
 
 
@@ -22,13 +23,13 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-8 gap-2">
+        <div className="hidden md:flex space-x-2 gap-2">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               className={clsx(
-                "text-text dark:text-dark-text font-cario font-medium hover:text-blue-600 dark:hover:text-blue-500 transition-colors duration-200 ml-2",
+                "text-text dark:text-dark-text font-cario font-medium hover:text-blue-600 dark:hover:text-blue-500 transition-colors duration-200",
                 location.pathname == link.path && "text-blue-600 font-semibold border-b-2 border-blue-600"
               )}
               
