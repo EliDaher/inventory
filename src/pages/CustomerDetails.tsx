@@ -17,6 +17,7 @@ export default function CustomerDetails() {
 
     const [isOpen, setIsOpen] = useState(false)
     const [payValue, setPayValue] = useState(0)
+    const [details, setDetails] = useState('')
     
     const columns = [
         { header: "القيمة", accessor: "القيمة" },
@@ -42,8 +43,9 @@ export default function CustomerDetails() {
 
             const res = await addPayment({
                 paymentValue: payValue,
-                customerName: customerData['الرقم'],
+                customerName: customerData['الاسم'],
                 customerId: customerData['المعرف'],
+                details: details
             })
 
             console.log(res)
@@ -113,6 +115,11 @@ export default function CustomerDetails() {
                                     label="قيمة الدفعة"
                                     value={payValue}
                                     onChange={(e) => {setPayValue(Number(e.target.value))}}
+                                />
+                                <Input 
+                                    label="ملاحظات"
+                                    value={details}
+                                    onChange={(e) => {setDetails(e.target.value)}}
                                 />
                                 <Button className="mr-auto"
                                     onClick={submit}
