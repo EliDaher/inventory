@@ -90,6 +90,7 @@ export default function CustomerDetails() {
                         "التاريخ": formatDate(prod.createdAt),
                         "عدد الفطع": prod.items ? prod.items.length : 0,
                         "id": prod.id,
+                        "details": prod.details,
                     }))}
                 />}
             </Card>
