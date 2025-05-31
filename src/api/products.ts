@@ -16,6 +16,11 @@ export async function addProduct(product: Product) {
   return response.data;
 }
 
+export async function updateProduct(product: Product) {
+  const response = await api.post("/updateProduct", product);
+  return response.data;
+}
+
 export async function getAllProducts() {
   const response = await api.get("/getAllProducts");
   return response.data;

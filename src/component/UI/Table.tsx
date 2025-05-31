@@ -8,9 +8,9 @@ interface Column {
 }
 
 interface TableProps {
-  data: { [key: string]: string | number }[];
+  data: { [key: string]: React.ReactNode }[];
   columns: Column[];
-  onRowClick?: (row: { [key: string]: string | number }) => void;
+  onRowClick?: (row: { [key: string]:  React.ReactNode }) => void;
   showPagination?: boolean;
 }
 

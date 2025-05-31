@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import Button from "../component/UI/Button";
 import Input from "../component/UI/Input";
 import { addPayment } from "../api/customer";
+import { deletePayment } from "../api/payments";
+import { deleteInoive } from "../api/invoices";
 
 export default function CustomerDetails() {
 
@@ -23,6 +25,50 @@ export default function CustomerDetails() {
         { header: "القيمة", accessor: "القيمة" },
         { header: "التاريخ", accessor: "التاريخ" },
         { header: "عدد الفطع", accessor: "عدد الفطع" },
+        { header: "", accessor: "حزف", 
+            render: (row: any) => (
+              <Button
+                className="bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600"
+                onClick={async () => {
+                    if(window.confirm('هل انت متأكد من عملية الحزف')){
+                        try{
+
+                            if(row['القيمة'].props.children > 0) {
+                                    const res = await deletePayment({
+                                    paymentDate: row['التاريخ'],
+                                    paymentId: row['id'],
+                                    paymentValue: row['القيمة'].props.children,
+                                    customerId: customerData['المعرف'],
+                                })
+                                if(res.success){
+                                    alert('تم الحزف بنجاح')
+                                    navigate('/customers')
+                                }
+
+                            }else{
+
+                                const res = await deleteInoive({
+                                    invoiceDate: row['التاريخ'],
+                                    invoiceId: row['id'],
+                                    invoiceValue: -row['القيمة'].props.children,
+                                    customerId: customerData['المعرف'],
+                                })
+                                if(res.success){
+                                    alert('تم الحزف بنجاح')
+                                    navigate('/customers')
+                                }
+
+                            }
+                        
+                        }catch (err) {
+                            console.error(err)
+                        }
+                    }
+                }}
+              >حزف</Button>
+
+            ),
+         },
     ];  
 
     useEffect(()=>{
@@ -35,7 +81,7 @@ export default function CustomerDetails() {
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
+        return `${day}-${month}-${year}`;
     };
 
     const submit = async () => {
@@ -45,7 +91,6 @@ export default function CustomerDetails() {
                 paymentValue: payValue,
                 customerName: customerData['الاسم'],
                 customerId: customerData['المعرف'],
-                details: details
             })
 
             console.log(res)
@@ -86,11 +131,15 @@ export default function CustomerDetails() {
                 { data && <Table
                     columns={columns}
                     data={data.map((prod) => ({
-                        "القيمة": prod.finalAmount,
+                        "القيمة": (
+                          <span style={{ fontWeight: "bold" ,color: prod.finalAmount > 0 ? "green" : "red"}}>
+                            {prod.finalAmount.toFixed(2)}
+                          </span>
+                        ),
                         "التاريخ": formatDate(prod.createdAt),
                         "عدد الفطع": prod.items ? prod.items.length : 0,
                         "id": prod.id,
-                        "details": prod.details,
+                        
                     }))}
                 />}
             </Card>

@@ -4,6 +4,7 @@ import Input from "../component/UI/Input";
 import ThemeToggle from "../component/ThemeToggle";
 import Button from "../component/UI/Button";
 import Card from "../component/UI/Card";
+import { updateProduct } from "../api/products";
 
 interface Product {
   id: string;
@@ -42,10 +43,12 @@ export default function ProductDetails() {
     };
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editedData) return;
     setProductData(editedData);
     console.log(formatForFirebase(editedData))
+    const res = await updateProduct(formatForFirebase(editedData))
+    console.log(res)
     navigate('/products')
     alert("✅ تم حفظ التعديلات بنجاح");
   };
